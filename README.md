@@ -54,4 +54,3 @@ Examples are compiled with:
 - Intel syntax (`-masm=intel`)
 - No optimization (`-O0`)
 - Verbose assembly (`-fverbose-asm`)
-- Debug info for better comments (`-g`)
