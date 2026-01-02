@@ -1,1 +1,9 @@
-<p>Function call with parameters and return value</p>
+<p>A simple function with parameters and a return value. This demonstrates the x86-64 calling convention where arguments are passed in registers.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Argument Passing:</strong> On x86-64, the first six integer arguments are passed in registers: <code>rdi</code>, <code>rsi</code>, <code>rdx</code>, <code>rcx</code>, <code>r8</code>, <code>r9</code></li>
+<li><strong>Function Prologue:</strong> The standard entry sequence that sets up the stack frame (<code>push rbp; mov rbp, rsp</code>)</li>
+<li><strong>Function Epilogue:</strong> The exit sequence that cleans up and returns (<code>pop rbp; ret</code>)</li>
+<li><strong>Return Values:</strong> Integer return values go in <code>rax</code> (32-bit values use <code>eax</code>)</li>
+</ul>
+<p class="reference">References: <a href="https://en.wikipedia.org/wiki/Function_prologue_and_epilogue" target="_blank">Wikipedia - Function prologue and epilogue</a>, <a href="https://www.sanfoundry.com/c-tutorials-prologue-epilogue-terms-context-functions-program/" target="_blank">Sanfoundry - Function Prologue and Epilogue</a></p>

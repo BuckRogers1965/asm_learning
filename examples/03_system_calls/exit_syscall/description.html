@@ -1,1 +1,9 @@
-<p>Using syscall() wrapper for exit</p>
+<p>Using the <code>syscall()</code wrapper to invoke the exit system call with a specific exit code.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Exit Codes:</strong> Programs return a status code to the shell (0 = success, non-zero = error)</li>
+<li><strong>System Call Numbers:</strong> Each system call has a unique number (<code>SYS_exit</code> is defined in system headers)</li>
+<li><strong>No Return:</strong> The exit system call terminates the process, so code after it never executes</li>
+<li><strong>syscall() Wrapper:</strong> This libc function provides a generic interface to make any system call</li>
+</ul>
+<p class="reference">Reference: <a href="https://people.ece.cornell.edu/land/courses/ece4760/GCC_asm/index.html" target="_blank">Cornell ECE - Assembler in GCC</a></p>

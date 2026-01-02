@@ -1,1 +1,9 @@
-<p>Simple recursive function (factorial)</p>
+<p>A recursive function computing factorial. This shows how the stack builds up with multiple function calls and how each call maintains its own stack frame.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Stack Frames:</strong> Each function call creates a new stack frame containing local variables and the return address</li>
+<li><strong>Recursion:</strong> The function calls itself, creating nested stack frames that unwind as the recursion completes</li>
+<li><strong>Base Case:</strong> The conditional check that stops the recursion translates to a compare and conditional jump</li>
+<li><strong>Call Stack:</strong> The <code>call</code> instruction pushes the return address onto the stack; <code>ret</code> pops it and jumps back</li>
+</ul>
+<p class="reference">References: <a href="https://textbook.cs161.org/memory-safety/x86.html" target="_blank">CS161 - x86 Assembly and Call Stack</a>, <a href="https://www.learnvulnerabilityresearch.com/stack-frame-function-prologue" target="_blank">Learn Vulnerability Research - Stack Frame</a></p>

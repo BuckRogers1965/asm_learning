@@ -1,1 +1,9 @@
-<p>Using the write system call directly</p>
+<p>Using the <code>write()</code> system call to output text directly to stdout. This bypasses the standard library and talks directly to the kernel.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>System Calls:</strong> A mechanism for user programs to request services from the kernel</li>
+<li><strong>File Descriptors:</strong> File descriptor 1 is standard output (stdout)</li>
+<li><strong>Direct Kernel Access:</strong> Unlike printf which uses buffered I/O, write() goes straight to the kernel</li>
+<li><strong>Calling Convention:</strong> System calls on Linux use the <code>syscall</code> instruction with arguments in specific registers</li>
+</ul>
+<p class="reference">Reference: <a href="https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html" target="_blank">GCC Documentation - Using Assembly Language with C</a></p>

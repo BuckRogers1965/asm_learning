@@ -1,4 +1,4 @@
 {
   "title": "System Calls",
-  "description": "Direct system call examples"
+  "description": "Direct interaction with the operating system kernel through system calls"
 }

@@ -1,1 +1,9 @@
-<p>Array access through pointer arithmetic</p>
+<p>Array access using pointer arithmetic. In C, <code>arr[i]</code> is equivalent to <code>*(arr + i)</code>.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Array to Pointer Decay:</strong> Array names automatically convert to pointers to their first element</li>
+<li><strong>Pointer Arithmetic:</strong> Adding to a pointer moves by (number × element size) bytes</li>
+<li><strong>Scaled Indexing:</strong> Modern x86 processors have addressing modes that combine base + offset × scale in one instruction</li>
+<li><strong>Memory Layout:</strong> Arrays are stored as contiguous blocks in memory, enabling efficient sequential access</li>
+</ul>
+<p class="reference">Reference: <a href="https://idea.popcount.org/2013-07-16-baby-steps-in-x86-assembly/" target="_blank">Baby steps in x86 assembly</a></p>

@@ -1,1 +1,8 @@
-<p>Basic variable declaration and arithmetic operations</p>
+<p>Basic variable declaration and arithmetic. This shows how local variables are allocated on the stack and how simple arithmetic operations translate to assembly instructions.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Stack Allocation:</strong> Local variables are stored on the stack, typically accessed via offsets from the base pointer (<code>rbp</code>)</li>
+<li><strong>Register Usage:</strong> The compiler uses registers for temporary calculations to improve performance</li>
+<li><strong>Arithmetic Instructions:</strong> Simple operations like addition compile to single instructions like <code>add</code> or <code>lea</code></li>
+</ul>
+<p class="reference">Reference: <a href="https://gist.github.com/lancejpollard/adf75b90137ef29e6f02" target="_blank">Simple C examples and their Assembly output from GCC</a></p>
