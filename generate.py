@@ -42,13 +42,18 @@ class AssemblyLearningGenerator:
                 str(c_file),
                 '-o', str(asm_file)
             ]
-                #'-g',                    # Debug info for better comments
             
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             
             with open(asm_file, 'r') as f:
-                return f.read()
-                
+                   asm_code = f.read()
+        
+            # Strip the full base directory path, keep only relative
+            base_path_str = str(self.base_dir.absolute())
+            asm_code = asm_code.replace(base_path_str + '/', './')
+        
+            return asm_code
+ 
         except subprocess.CalledProcessError as e:
             return f"# Compilation error:\n# {e.stderr}"
         except Exception as e:
@@ -155,7 +160,7 @@ class AssemblyLearningGenerator:
             content = header_template.replace("{TITLE}", topic["title"]).replace("{NAV_LINKS}", nav_links)
             
             # Add topic description
-            content += f'<div class="example"><h2>Overview</h2><div class="description">{topic["description"]}</div></div>\n'
+            content += f'<div class="example"><h2>Overview</h2><div class="description"><p>{topic["description"]}</p></div></div>\n'
             
             # Add examples
             for example in topic["examples"]:
@@ -188,13 +193,31 @@ class AssemblyLearningGenerator:
     <div class="example">
         <h2>Welcome to Assembly Language Learning</h2>
         <div class="description">
-            <p>This documentation demonstrates how C code compiles to assembly language. Each example shows:</p>
+            <p>This documentation demonstrates how C code compiles to assembly language. Each example shows the C source code alongside the generated assembly code with verbose comments explaining the compiler's choices.</p>
+            
+            <h3>How to Use This Guide</h3>
+            <p>Each example includes:</p>
             <ul>
                 <li><strong>C Code</strong>: The high-level source code</li>
-                <li><strong>Assembly Code</strong>: The compiled assembly (Intel syntax, unoptimized)</li>
-                <li>Verbose comments showing variable-to-register mappings</li>
+                <li><strong>Assembly Code</strong>: The compiled assembly (Intel syntax, unoptimized with <code>-O0</code>)</li>
+                <li><strong>Verbose Comments</strong>: Compiler-generated comments showing variable-to-register mappings</li>
+                <li><strong>Explanations</strong>: Key concepts with links to authoritative references</li>
             </ul>
-            <p>Select a topic from the navigation above to begin learning.</p>
+            
+            <h3>Compilation Settings</h3>
+            <p>All examples are compiled with:</p>
+            <ul>
+                <li><code>-S</code>: Generate assembly output</li>
+                <li><code>-masm=intel</code>: Use Intel syntax (more readable than AT&T)</li>
+                <li><code>-O0</code>: No optimization (easier to follow)</li>
+                <li><code>-fverbose-asm</code>: Include extra comments</li>
+            </ul>
+            
+            <h3>Learning Path</h3>
+            <p>Start with <strong>Basic Concepts</strong> to understand how variables and simple operations work, then progress through <strong>Functions</strong> to learn about the calling convention and stack frames, explore <strong>System Calls</strong> to see direct kernel interaction, and finally study <strong>Pointers</strong> to understand memory addressing.</p>
+            
+            <p class="reference">For more information about generating assembly with GCC, see: 
+            <a href="https://lindevs.com/generate-assembly-code-using-gcc-or-g-compiler" target="_blank">Generate Assembly Code using gcc or g++ Compiler</a></p>
         </div>
         <h3>Available Topics</h3>
 """
