@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitwise Operations - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bitwise Operations</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>Bit manipulation and logical operations</p></div></div>
+
+    <div class="example">
+        <h2>Bit Shifts</h2>
+        <div class="description">
+            <p>Left and right bit shift operations.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Left Shift:</strong> The <code>shl</code> instruction shifts bits left (multiply by 2^n)</li>
+<li><strong>Right Shift:</strong> The <code>shr</code> instruction shifts bits right unsigned (divide by 2^n)</li>
+<li><strong>Arithmetic Shift:</strong> <code>sar</code> preserves the sign bit for signed integers</li>
+<li><strong>Shift Amount:</strong> Usually specified in the <code>cl</code> register or as immediate</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Arithmetic_shift" target="_blank">Wikipedia - Arithmetic shift</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int x = 8;
+    
+    int left = x &lt;&lt; 2;   // 32 (multiply by 4)
+    int right = x &gt;&gt; 1;  // 4 (divide by 2)
+    
+    return left + right;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;bit_shifts.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:2:     int x = 8;
+	mov	DWORD PTR -4[rbp], 8	# x,
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:4:     int left = x &lt;&lt; 2;   // 32 (multiply by 4)
+	mov	eax, DWORD PTR -4[rbp]	# tmp87, x
+	sal	eax, 2	# tmp86,
+	mov	DWORD PTR -8[rbp], eax	# left, tmp86
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:5:     int right = x &gt;&gt; 1;  // 4 (divide by 2)
+	mov	eax, DWORD PTR -4[rbp]	# tmp91, x
+	sar	eax	# tmp90
+	mov	DWORD PTR -12[rbp], eax	# right, tmp90
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:7:     return left + right;
+	mov	edx, DWORD PTR -8[rbp]	# tmp92, left
+	mov	eax, DWORD PTR -12[rbp]	# tmp93, right
+	add	eax, edx	# _4, tmp92
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:8: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Bitwise And Or</h2>
+        <div class="description">
+            <p>Bitwise AND, OR, and XOR operations.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Bitwise AND:</strong> The <code>and</code> instruction performs bit-by-bit logical AND</li>
+<li><strong>Bitwise OR:</strong> The <code>or</code> instruction performs bit-by-bit logical OR</li>
+<li><strong>Bitwise XOR:</strong> The <code>xor</code> instruction performs bit-by-bit exclusive OR</li>
+<li><strong>Common Uses:</strong> Masking bits, setting flags, toggling bits</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Bitwise_operation" target="_blank">Wikipedia - Bitwise operation</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int a = 0b1010;  // 10
+    int b = 0b1100;  // 12
+    
+    int and_result = a &amp; b;  // 0b1000 = 8
+    int or_result = a | b;   // 0b1110 = 14
+    int xor_result = a ^ b;  // 0b0110 = 6
+    
+    return and_result + or_result + xor_result;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;bitwise_and_or.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:2:     int a = 0b1010;  // 10
+	mov	DWORD PTR -4[rbp], 10	# a,
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:3:     int b = 0b1100;  // 12
+	mov	DWORD PTR -8[rbp], 12	# b,
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:5:     int and_result = a &amp; b;  // 0b1000 = 8
+	mov	eax, DWORD PTR -4[rbp]	# tmp88, a
+	and	eax, DWORD PTR -8[rbp]	# tmp87, b
+	mov	DWORD PTR -12[rbp], eax	# and_result, tmp87
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:6:     int or_result = a | b;   // 0b1110 = 14
+	mov	eax, DWORD PTR -4[rbp]	# tmp92, a
+	or	eax, DWORD PTR -8[rbp]	# tmp91, b
+	mov	DWORD PTR -16[rbp], eax	# or_result, tmp91
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:7:     int xor_result = a ^ b;  // 0b0110 = 6
+	mov	eax, DWORD PTR -4[rbp]	# tmp96, a
+	xor	eax, DWORD PTR -8[rbp]	# tmp95, b
+	mov	DWORD PTR -20[rbp], eax	# xor_result, tmp95
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:9:     return and_result + or_result + xor_result;
+	mov	edx, DWORD PTR -12[rbp]	# tmp97, and_result
+	mov	eax, DWORD PTR -16[rbp]	# tmp98, or_result
+	add	edx, eax	# _1, tmp98
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:9:     return and_result + or_result + xor_result;
+	mov	eax, DWORD PTR -20[rbp]	# tmp99, xor_result
+	add	eax, edx	# _7, _1
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:10: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>

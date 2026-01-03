@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structures and Unions - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Structures and Unions</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>Composite data types and their memory layout</p></div></div>
+
+    <div class="example">
+        <h2>Simple Struct</h2>
+        <div class="description">
+            <p>Basic structure showing member access and memory layout.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Struct Layout:</strong> Members are laid out sequentially in memory</li>
+<li><strong>Member Access:</strong> Accessing members uses fixed offsets from the struct base address</li>
+<li><strong>Padding:</strong> The compiler may insert padding between members for alignment</li>
+<li><strong>Stack Allocation:</strong> Struct instances on the stack are allocated like arrays</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Data_structure_alignment" target="_blank">Wikipedia - Data structure alignment</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>struct Point {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Point p;
+    p.x = 10;
+    p.y = 20;
+    return p.x + p.y;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;simple_struct.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/07_structures/simple_struct/simple_struct.c:8:     p.x = 10;
+	mov	DWORD PTR -8[rbp], 10	# p.x,
+# ./examples/07_structures/simple_struct/simple_struct.c:9:     p.y = 20;
+	mov	DWORD PTR -4[rbp], 20	# p.y,
+# ./examples/07_structures/simple_struct/simple_struct.c:10:     return p.x + p.y;
+	mov	edx, DWORD PTR -8[rbp]	# _1, p.x
+# ./examples/07_structures/simple_struct/simple_struct.c:10:     return p.x + p.y;
+	mov	eax, DWORD PTR -4[rbp]	# _2, p.y
+# ./examples/07_structures/simple_struct/simple_struct.c:10:     return p.x + p.y;
+	add	eax, edx	# _6, _1
+# ./examples/07_structures/simple_struct/simple_struct.c:11: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Struct Pointer</h2>
+        <div class="description">
+            <p>Accessing struct members through pointers.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Arrow Operator:</strong> The <code>-></code> operator dereferences the pointer and accesses the member</li>
+<li><strong>Address Calculation:</strong> Member access adds the offset to the pointer value</li>
+<li><strong>Indirect Access:</strong> The assembly uses the pointer register plus offset</li>
+<li><strong>Equivalent Operations:</strong> <code>ptr->member</code> is equivalent to <code>(*ptr).member</code></li>
+</ul>
+<p class="reference">Reference: <a href="https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packing/" target="_blank">GeeksforGeeks - Structure member alignment and padding</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>struct Point {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Point p = {5, 10};
+    struct Point *ptr = &amp;p;
+    return ptr-&gt;x + ptr-&gt;y;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;struct_pointer.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/07_structures/struct_pointer/struct_pointer.c:7:     struct Point p = {5, 10};
+	mov	DWORD PTR -16[rbp], 5	# p.x,
+	mov	DWORD PTR -12[rbp], 10	# p.y,
+# ./examples/07_structures/struct_pointer/struct_pointer.c:8:     struct Point *ptr = &amp;p;
+	lea	rax, -16[rbp]	# tmp86,
+	mov	QWORD PTR -8[rbp], rax	# ptr, tmp86
+# ./examples/07_structures/struct_pointer/struct_pointer.c:9:     return ptr-&gt;x + ptr-&gt;y;
+	mov	rax, QWORD PTR -8[rbp]	# tmp87, ptr
+	mov	edx, DWORD PTR [rax]	# _1, ptr_6-&gt;x
+# ./examples/07_structures/struct_pointer/struct_pointer.c:9:     return ptr-&gt;x + ptr-&gt;y;
+	mov	rax, QWORD PTR -8[rbp]	# tmp88, ptr
+	mov	eax, DWORD PTR 4[rax]	# _2, ptr_6-&gt;y
+# ./examples/07_structures/struct_pointer/struct_pointer.c:9:     return ptr-&gt;x + ptr-&gt;y;
+	add	eax, edx	# _7, _1
+# ./examples/07_structures/struct_pointer/struct_pointer.c:10: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>

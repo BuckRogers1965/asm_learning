@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Concepts - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Advanced Concepts</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>More complex patterns and optimizations</p></div></div>
+
+    <div class="example">
+        <h2>Function Pointer</h2>
+        <div class="description">
+            <p>Using function pointers for indirect function calls.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Function Pointers:</strong> Variables that hold the address of a function</li>
+<li><strong>Indirect Call:</strong> The <code>call</code> instruction uses a register instead of immediate address</li>
+<li><strong>Runtime Selection:</strong> The actual function called can be determined at runtime</li>
+<li><strong>Callbacks:</strong> Function pointers enable callback mechanisms and dynamic dispatch</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Function_pointer" target="_blank">Wikipedia - Function pointer</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}
+
+int main() {
+    int (*operation)(int, int);
+    operation = &amp;add;
+    int result = operation(10, 5);
+    return result;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;function_pointer.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	add
+	.type	add, @function
+add:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	mov	DWORD PTR -4[rbp], edi	# a, a
+	mov	DWORD PTR -8[rbp], esi	# b, b
+# ./examples/10_advanced/function_pointer/function_pointer.c:2:     return a + b;
+	mov	edx, DWORD PTR -4[rbp]	# tmp84, a
+	mov	eax, DWORD PTR -8[rbp]	# tmp85, b
+	add	eax, edx	# _3, tmp84
+# ./examples/10_advanced/function_pointer/function_pointer.c:3: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	add, .-add
+	.globl	subtract
+	.type	subtract, @function
+subtract:
+.LFB1:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	mov	DWORD PTR -4[rbp], edi	# a, a
+	mov	DWORD PTR -8[rbp], esi	# b, b
+# ./examples/10_advanced/function_pointer/function_pointer.c:6:     return a - b;
+	mov	eax, DWORD PTR -4[rbp]	# tmp84, a
+	sub	eax, DWORD PTR -8[rbp]	# _3, b
+# ./examples/10_advanced/function_pointer/function_pointer.c:7: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE1:
+	.size	subtract, .-subtract
+	.globl	main
+	.type	main, @function
+main:
+.LFB2:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	sub	rsp, 16	#,
+# ./examples/10_advanced/function_pointer/function_pointer.c:11:     operation = &amp;add;
+	lea	rax, add[rip]	# tmp84,
+	mov	QWORD PTR -8[rbp], rax	# operation, tmp84
+# ./examples/10_advanced/function_pointer/function_pointer.c:12:     int result = operation(10, 5);
+	mov	rax, QWORD PTR -8[rbp]	# tmp85, operation
+	mov	esi, 5	#,
+	mov	edi, 10	#,
+	call	rax	# tmp85
+	mov	DWORD PTR -12[rbp], eax	# result, tmp86
+# ./examples/10_advanced/function_pointer/function_pointer.c:13:     return result;
+	mov	eax, DWORD PTR -12[rbp]	# _5, result
+# ./examples/10_advanced/function_pointer/function_pointer.c:14: }
+	leave	
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE2:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Inline Function</h2>
+        <div class="description">
+            <p>Function marked as inline (may be inlined by compiler even at -O0).</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Inline Hint:</strong> The <code>inline</code> keyword suggests the compiler should inline the function</li>
+<li><strong>Function Inlining:</strong> The function body is inserted directly instead of a call</li>
+<li><strong>Trade-offs:</strong> Inlining eliminates call overhead but increases code size</li>
+<li><strong>Compiler Decision:</strong> The compiler decides whether to actually inline</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Inline_expansion" target="_blank">Wikipedia - Inline expansion</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>static inline int square(int x) {
+    return x * x;
+}
+
+int main() {
+    int a = 5;
+    int b = square(a);
+    return b;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;inline_function.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.type	square, @function
+square:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	mov	DWORD PTR -4[rbp], edi	# x, x
+# ./examples/10_advanced/inline_function/inline_function.c:2:     return x * x;
+	mov	eax, DWORD PTR -4[rbp]	# tmp84, x
+	imul	eax, eax	# _2, tmp84
+# ./examples/10_advanced/inline_function/inline_function.c:3: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	square, .-square
+	.globl	main
+	.type	main, @function
+main:
+.LFB1:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	sub	rsp, 16	#,
+# ./examples/10_advanced/inline_function/inline_function.c:6:     int a = 5;
+	mov	DWORD PTR -4[rbp], 5	# a,
+# ./examples/10_advanced/inline_function/inline_function.c:7:     int b = square(a);
+	mov	eax, DWORD PTR -4[rbp]	# tmp84, a
+	mov	edi, eax	#, tmp84
+	call	square	#
+	mov	DWORD PTR -8[rbp], eax	# b, tmp85
+# ./examples/10_advanced/inline_function/inline_function.c:8:     return b;
+	mov	eax, DWORD PTR -8[rbp]	# _5, b
+# ./examples/10_advanced/inline_function/inline_function.c:9: }
+	leave	
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE1:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Volatile Variable</h2>
+        <div class="description">
+            <p>Volatile keyword preventing compiler optimization of variable access.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Volatile Qualifier:</strong> Tells the compiler the variable may change unexpectedly</li>
+<li><strong>No Optimization:</strong> The compiler must always read/write the actual memory location</li>
+<li><strong>Hardware Registers:</strong> Often used for memory-mapped I/O and hardware registers</li>
+<li><strong>Side Effects:</strong> Ensures all reads and writes happen as specified in code</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Volatile_(computer_programming)" target="_blank">Wikipedia - Volatile (computer programming)</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    volatile int x = 10;
+    x = x + 5;
+    x = x + 3;
+    return x;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;volatile_variable.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:2:     volatile int x = 10;
+	mov	DWORD PTR -4[rbp], 10	# x,
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:3:     x = x + 5;
+	mov	eax, DWORD PTR -4[rbp]	# x.0_1, x
+	add	eax, 5	# _2,
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:3:     x = x + 5;
+	mov	DWORD PTR -4[rbp], eax	# x, _2
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:4:     x = x + 3;
+	mov	eax, DWORD PTR -4[rbp]	# x.1_3, x
+	add	eax, 3	# _4,
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:4:     x = x + 3;
+	mov	DWORD PTR -4[rbp], eax	# x, _4
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:5:     return x;
+	mov	eax, DWORD PTR -4[rbp]	# _9, x
+# ./examples/10_advanced/volatile_variable/volatile_variable.c:6: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>

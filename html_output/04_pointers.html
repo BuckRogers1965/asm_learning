@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pointers - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pointers</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>Memory addresses, pointer operations, and indirect memory access</p></div></div>
+
+    <div class="example">
+        <h2>Pointer Arithmetic</h2>
+        <div class="description">
+            <p>Array access using pointer arithmetic. In C, <code>arr[i]</code> is equivalent to <code>*(arr + i)</code>.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Array to Pointer Decay:</strong> Array names automatically convert to pointers to their first element</li>
+<li><strong>Pointer Arithmetic:</strong> Adding to a pointer moves by (number × element size) bytes</li>
+<li><strong>Scaled Indexing:</strong> Modern x86 processors have addressing modes that combine base + offset × scale in one instruction</li>
+<li><strong>Memory Layout:</strong> Arrays are stored as contiguous blocks in memory, enabling efficient sequential access</li>
+</ul>
+<p class="reference">Reference: <a href="https://idea.popcount.org/2013-07-16-baby-steps-in-x86-assembly/" target="_blank">Baby steps in x86 assembly</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int arr[5] = {1, 2, 3, 4, 5};
+    int *ptr = arr;
+    int second = *(ptr + 1);
+    return second;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;pointer_arithmetic.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:2:     int arr[5] = {1, 2, 3, 4, 5};
+	mov	DWORD PTR -32[rbp], 1	# arr[0],
+	mov	DWORD PTR -28[rbp], 2	# arr[1],
+	mov	DWORD PTR -24[rbp], 3	# arr[2],
+	mov	DWORD PTR -20[rbp], 4	# arr[3],
+	mov	DWORD PTR -16[rbp], 5	# arr[4],
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:3:     int *ptr = arr;
+	lea	rax, -32[rbp]	# tmp84,
+	mov	QWORD PTR -8[rbp], rax	# ptr, tmp84
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:4:     int second = *(ptr + 1);
+	mov	rax, QWORD PTR -8[rbp]	# tmp85, ptr
+	mov	eax, DWORD PTR 4[rax]	# tmp86, MEM[(int *)ptr_7 + 4B]
+	mov	DWORD PTR -12[rbp], eax	# second, tmp86
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:5:     return second;
+	mov	eax, DWORD PTR -12[rbp]	# _9, second
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:6: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Pointer Basics</h2>
+        <div class="description">
+            <p>Basic pointer operations: taking the address of a variable (<code>&</code>) and dereferencing (<code>*</code>).</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Memory Addresses:</strong> Variables are stored at memory locations; pointers hold these addresses</li>
+<li><strong>Address-of Operator (<code>&</code>):</strong> Compiles to the <code>lea</code> (load effective address) instruction</li>
+<li><strong>Dereference Operator (<code>*</code>):</strong> Compiles to a <code>mov</code> instruction that reads from the memory address</li>
+<li><strong>Pointer Variables:</strong> Stored on the stack just like regular variables, but contain addresses</li>
+</ul>
+<p class="reference">Reference: <a href="https://lindevs.com/generate-assembly-code-using-gcc-or-g-compiler" target="_blank">Lindevs - Generate Assembly Code using gcc</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int x = 42;
+    int *ptr = &amp;x;
+    int y = *ptr;
+    return y;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;pointer_basics.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:2:     int x = 42;
+	mov	DWORD PTR -16[rbp], 42	# x,
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:3:     int *ptr = &amp;x;
+	lea	rax, -16[rbp]	# tmp84,
+	mov	QWORD PTR -8[rbp], rax	# ptr, tmp84
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:4:     int y = *ptr;
+	mov	rax, QWORD PTR -8[rbp]	# tmp85, ptr
+	mov	eax, DWORD PTR [rax]	# tmp86, *ptr_3
+	mov	DWORD PTR -12[rbp], eax	# y, tmp86
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:5:     return y;
+	mov	eax, DWORD PTR -12[rbp]	# _5, y
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:6: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>

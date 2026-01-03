@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functions - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Functions</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>Function calls, parameters, and return values - understanding the calling convention</p></div></div>
+
+    <div class="example">
+        <h2>Recursive</h2>
+        <div class="description">
+            <p>A recursive function computing factorial. This shows how the stack builds up with multiple function calls and how each call maintains its own stack frame.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Stack Frames:</strong> Each function call creates a new stack frame containing local variables and the return address</li>
+<li><strong>Recursion:</strong> The function calls itself, creating nested stack frames that unwind as the recursion completes</li>
+<li><strong>Base Case:</strong> The conditional check that stops the recursion translates to a compare and conditional jump</li>
+<li><strong>Call Stack:</strong> The <code>call</code> instruction pushes the return address onto the stack; <code>ret</code> pops it and jumps back</li>
+</ul>
+<p class="reference">References: <a href="https://textbook.cs161.org/memory-safety/x86.html" target="_blank">CS161 - x86 Assembly and Call Stack</a>, <a href="https://www.learnvulnerabilityresearch.com/stack-frame-function-prologue" target="_blank">Learn Vulnerability Research - Stack Frame</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int factorial(int n) {
+    if (n &lt;= 1) return 1;
+    return n * factorial(n - 1);
+}
+
+int main() {
+    return factorial(5);
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;recursive.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	factorial
+	.type	factorial, @function
+factorial:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	sub	rsp, 16	#,
+	mov	DWORD PTR -4[rbp], edi	# n, n
+# ./examples/02_functions/recursive/recursive.c:2:     if (n &lt;= 1) return 1;
+	cmp	DWORD PTR -4[rbp], 1	# n,
+	jg	.L2	#,
+# ./examples/02_functions/recursive/recursive.c:2:     if (n &lt;= 1) return 1;
+	mov	eax, 1	# _3,
+	jmp	.L3	#
+.L2:
+# ./examples/02_functions/recursive/recursive.c:3:     return n * factorial(n - 1);
+	mov	eax, DWORD PTR -4[rbp]	# tmp86, n
+	sub	eax, 1	# _1,
+	mov	edi, eax	#, _1
+	call	factorial	#
+# ./examples/02_functions/recursive/recursive.c:3:     return n * factorial(n - 1);
+	imul	eax, DWORD PTR -4[rbp]	# _3, n
+.L3:
+# ./examples/02_functions/recursive/recursive.c:4: }
+	leave	
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	factorial, .-factorial
+	.globl	main
+	.type	main, @function
+main:
+.LFB1:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/02_functions/recursive/recursive.c:7:     return factorial(5);
+	mov	edi, 5	#,
+	call	factorial	#
+# ./examples/02_functions/recursive/recursive.c:8: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE1:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Simple Function</h2>
+        <div class="description">
+            <p>A simple function with parameters and a return value. This demonstrates the x86-64 calling convention where arguments are passed in registers.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Argument Passing:</strong> On x86-64, the first six integer arguments are passed in registers: <code>rdi</code>, <code>rsi</code>, <code>rdx</code>, <code>rcx</code>, <code>r8</code>, <code>r9</code></li>
+<li><strong>Function Prologue:</strong> The standard entry sequence that sets up the stack frame (<code>push rbp; mov rbp, rsp</code>)</li>
+<li><strong>Function Epilogue:</strong> The exit sequence that cleans up and returns (<code>pop rbp; ret</code>)</li>
+<li><strong>Return Values:</strong> Integer return values go in <code>rax</code> (32-bit values use <code>eax</code>)</li>
+</ul>
+<p class="reference">References: <a href="https://en.wikipedia.org/wiki/Function_prologue_and_epilogue" target="_blank">Wikipedia - Function prologue and epilogue</a>, <a href="https://www.sanfoundry.com/c-tutorials-prologue-epilogue-terms-context-functions-program/" target="_blank">Sanfoundry - Function Prologue and Epilogue</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int add(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    int result = add(5, 3);
+    return result;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;simple_function.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	add
+	.type	add, @function
+add:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	mov	DWORD PTR -4[rbp], edi	# a, a
+	mov	DWORD PTR -8[rbp], esi	# b, b
+# ./examples/02_functions/simple_function/simple_function.c:2:     return a + b;
+	mov	edx, DWORD PTR -4[rbp]	# tmp84, a
+	mov	eax, DWORD PTR -8[rbp]	# tmp85, b
+	add	eax, edx	# _3, tmp84
+# ./examples/02_functions/simple_function/simple_function.c:3: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	add, .-add
+	.globl	main
+	.type	main, @function
+main:
+.LFB1:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+	sub	rsp, 16	#,
+# ./examples/02_functions/simple_function/simple_function.c:6:     int result = add(5, 3);
+	mov	esi, 3	#,
+	mov	edi, 5	#,
+	call	add	#
+	mov	DWORD PTR -4[rbp], eax	# result, tmp84
+# ./examples/02_functions/simple_function/simple_function.c:7:     return result;
+	mov	eax, DWORD PTR -4[rbp]	# _4, result
+# ./examples/02_functions/simple_function/simple_function.c:8: }
+	leave	
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE1:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>

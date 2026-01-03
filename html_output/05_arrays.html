@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrays and Memory - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Arrays and Memory</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>Array initialization, access patterns, and memory layout</p></div></div>
+
+    <div class="example">
+        <h2>Array Initialization</h2>
+        <div class="description">
+            <p>Array initialization and how the compiler handles constant data.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Stack Allocation:</strong> Arrays are allocated on the stack with space reserved by adjusting the stack pointer</li>
+<li><strong>Initialization Loop:</strong> The compiler may use loops or direct moves to initialize array elements</li>
+<li><strong>Memory Layout:</strong> Array elements are stored contiguously in memory</li>
+<li><strong>Alignment:</strong> Arrays may be aligned to word boundaries for performance</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Data_structure_alignment" target="_blank">Wikipedia - Data structure alignment</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int sum = 0;
+    for (int i = 0; i &lt; 5; i++) {
+        sum += arr[i];
+    }
+    return sum;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;array_initialization.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/05_arrays/array_initialization/array_initialization.c:2:     int arr[5] = {10, 20, 30, 40, 50};
+	mov	DWORD PTR -32[rbp], 10	# arr[0],
+	mov	DWORD PTR -28[rbp], 20	# arr[1],
+	mov	DWORD PTR -24[rbp], 30	# arr[2],
+	mov	DWORD PTR -20[rbp], 40	# arr[3],
+	mov	DWORD PTR -16[rbp], 50	# arr[4],
+# ./examples/05_arrays/array_initialization/array_initialization.c:3:     int sum = 0;
+	mov	DWORD PTR -4[rbp], 0	# sum,
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	mov	DWORD PTR -8[rbp], 0	# i,
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	jmp	.L2	#
+.L3:
+# ./examples/05_arrays/array_initialization/array_initialization.c:5:         sum += arr[i];
+	mov	eax, DWORD PTR -8[rbp]	# tmp86, i
+	cdqe
+	mov	eax, DWORD PTR -32[rbp+rax*4]	# _1, arr[i_3]
+# ./examples/05_arrays/array_initialization/array_initialization.c:5:         sum += arr[i];
+	add	DWORD PTR -4[rbp], eax	# sum, _1
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	add	DWORD PTR -8[rbp], 1	# i,
+.L2:
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	cmp	DWORD PTR -8[rbp], 4	# i,
+	jle	.L3	#,
+# ./examples/05_arrays/array_initialization/array_initialization.c:7:     return sum;
+	mov	eax, DWORD PTR -4[rbp]	# _12, sum
+# ./examples/05_arrays/array_initialization/array_initialization.c:8: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Multidimensional Array</h2>
+        <div class="description">
+            <p>Two-dimensional arrays and row-major order storage.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Row-Major Order:</strong> C stores 2D arrays in row-major order (all elements of row 0, then row 1, etc.)</li>
+<li><strong>Index Calculation:</strong> Element [i][j] is at offset (i * num_columns + j) * element_size</li>
+<li><strong>Nested Loops:</strong> Accessing 2D arrays typically uses nested loops in assembly</li>
+<li><strong>Cache Efficiency:</strong> Row-major access patterns are more cache-friendly</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order" target="_blank">Wikipedia - Row and column-major order</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int matrix[2][3] = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
+    int sum = matrix[0][1] + matrix[1][2];
+    return sum;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;multidimensional_array.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:2:     int matrix[2][3] = {
+	mov	DWORD PTR -32[rbp], 1	# matrix[0][0],
+	mov	DWORD PTR -28[rbp], 2	# matrix[0][1],
+	mov	DWORD PTR -24[rbp], 3	# matrix[0][2],
+	mov	DWORD PTR -20[rbp], 4	# matrix[1][0],
+	mov	DWORD PTR -16[rbp], 5	# matrix[1][1],
+	mov	DWORD PTR -12[rbp], 6	# matrix[1][2],
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
+	mov	edx, DWORD PTR -28[rbp]	# _1, matrix[0][1]
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
+	mov	eax, DWORD PTR -12[rbp]	# _2, matrix[1][2]
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
+	add	eax, edx	# tmp86, _1
+	mov	DWORD PTR -4[rbp], eax	# sum, tmp86
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:7:     return sum;
+	mov	eax, DWORD PTR -4[rbp]	# _11, sum
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:8: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>

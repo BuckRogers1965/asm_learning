@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Flow - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .example {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .example h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .code-section {
+            margin: 20px 0;
+        }
+        .code-section h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .c-code { border-left: 4px solid #61dafb; }
+        .asm-code { border-left: 4px solid #98c379; }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Control Flow</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
+    </nav>
+<div class="example"><h2>Overview</h2><div class="description"><p>Conditionals, loops, and branching in assembly</p></div></div>
+
+    <div class="example">
+        <h2>For Loop</h2>
+        <div class="description">
+            <p>For loop showing initialization, condition, and increment in assembly.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Loop Counter:</strong> A variable (often in a register) tracks the loop iteration</li>
+<li><strong>Three-Part Structure:</strong> Initialization, condition check, and increment are separate instructions</li>
+<li><strong>Optimization Potential:</strong> Compilers can optimize loops significantly with higher optimization levels</li>
+<li><strong>Loop Unrolling:</strong> At higher optimization, compilers may unroll loops for performance</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Loop_optimization" target="_blank">Wikipedia - Loop optimization</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int sum = 0;
+    
+    for (int i = 0; i &lt; 10; i++) {
+        sum += i;
+    }
+    
+    return sum;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;for_loop.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/06_control_flow/for_loop/for_loop.c:2:     int sum = 0;
+	mov	DWORD PTR -4[rbp], 0	# sum,
+# ./examples/06_control_flow/for_loop/for_loop.c:4:     for (int i = 0; i &lt; 10; i++) {
+	mov	DWORD PTR -8[rbp], 0	# i,
+# ./examples/06_control_flow/for_loop/for_loop.c:4:     for (int i = 0; i &lt; 10; i++) {
+	jmp	.L2	#
+.L3:
+# ./examples/06_control_flow/for_loop/for_loop.c:5:         sum += i;
+	mov	eax, DWORD PTR -8[rbp]	# tmp84, i
+	add	DWORD PTR -4[rbp], eax	# sum, tmp84
+# ./examples/06_control_flow/for_loop/for_loop.c:4:     for (int i = 0; i &lt; 10; i++) {
+	add	DWORD PTR -8[rbp], 1	# i,
+.L2:
+# ./examples/06_control_flow/for_loop/for_loop.c:4:     for (int i = 0; i &lt; 10; i++) {
+	cmp	DWORD PTR -8[rbp], 9	# i,
+	jle	.L3	#,
+# ./examples/06_control_flow/for_loop/for_loop.c:8:     return sum;
+	mov	eax, DWORD PTR -4[rbp]	# _5, sum
+# ./examples/06_control_flow/for_loop/for_loop.c:9: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>If Else</h2>
+        <div class="description">
+            <p>Simple if-else statement showing conditional branching.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Comparison:</strong> The <code>cmp</code> instruction compares two values and sets flags</li>
+<li><strong>Conditional Jump:</strong> Instructions like <code>jle</code> (jump if less or equal) branch based on flags</li>
+<li><strong>Labels:</strong> Branch targets are represented as labels in assembly</li>
+<li><strong>Fall-through:</strong> If the condition is false, execution continues to the next instruction</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikibooks.org/wiki/X86_Assembly/Control_Flow" target="_blank">Wikibooks - X86 Assembly Control Flow</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int x = 10;
+    int result;
+    
+    if (x &gt; 5) {
+        result = x * 2;
+    } else {
+        result = x + 1;
+    }
+    
+    return result;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;if_else.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/06_control_flow/if_else/if_else.c:2:     int x = 10;
+	mov	DWORD PTR -8[rbp], 10	# x,
+# ./examples/06_control_flow/if_else/if_else.c:5:     if (x &gt; 5) {
+	cmp	DWORD PTR -8[rbp], 5	# x,
+	jle	.L2	#,
+# ./examples/06_control_flow/if_else/if_else.c:6:         result = x * 2;
+	mov	eax, DWORD PTR -8[rbp]	# tmp87, x
+	add	eax, eax	# tmp86
+	mov	DWORD PTR -4[rbp], eax	# result, tmp86
+	jmp	.L3	#
+.L2:
+# ./examples/06_control_flow/if_else/if_else.c:8:         result = x + 1;
+	mov	eax, DWORD PTR -8[rbp]	# tmp91, x
+	add	eax, 1	# tmp90,
+	mov	DWORD PTR -4[rbp], eax	# result, tmp90
+.L3:
+# ./examples/06_control_flow/if_else/if_else.c:11:     return result;
+	mov	eax, DWORD PTR -4[rbp]	# _5, result
+# ./examples/06_control_flow/if_else/if_else.c:12: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>Switch Statement</h2>
+        <div class="description">
+            <p>Switch statement showing jump tables or conditional chains.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Jump Table:</strong> For dense cases, the compiler may generate a jump table for O(1) lookup</li>
+<li><strong>Conditional Chain:</strong> For sparse cases, the compiler uses a series of comparisons</li>
+<li><strong>Default Case:</strong> The default case is the fall-through when no case matches</li>
+<li><strong>Compiler Optimization:</strong> The compiler chooses the most efficient implementation</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Branch_table" target="_blank">Wikipedia - Branch table</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int x = 2;
+    int result;
+    
+    switch(x) {
+        case 1:
+            result = 10;
+            break;
+        case 2:
+            result = 20;
+            break;
+        case 3:
+            result = 30;
+            break;
+        default:
+            result = 0;
+    }
+    
+    return result;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;switch_statement.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/06_control_flow/switch_statement/switch_statement.c:2:     int x = 2;
+	mov	DWORD PTR -8[rbp], 2	# x,
+# ./examples/06_control_flow/switch_statement/switch_statement.c:5:     switch(x) {
+	cmp	DWORD PTR -8[rbp], 3	# x,
+	je	.L2	#,
+	cmp	DWORD PTR -8[rbp], 3	# x,
+	jg	.L3	#,
+	cmp	DWORD PTR -8[rbp], 1	# x,
+	je	.L4	#,
+	cmp	DWORD PTR -8[rbp], 2	# x,
+	je	.L5	#,
+	jmp	.L3	#
+.L4:
+# ./examples/06_control_flow/switch_statement/switch_statement.c:7:             result = 10;
+	mov	DWORD PTR -4[rbp], 10	# result,
+# ./examples/06_control_flow/switch_statement/switch_statement.c:8:             break;
+	jmp	.L6	#
+.L5:
+# ./examples/06_control_flow/switch_statement/switch_statement.c:10:             result = 20;
+	mov	DWORD PTR -4[rbp], 20	# result,
+# ./examples/06_control_flow/switch_statement/switch_statement.c:11:             break;
+	jmp	.L6	#
+.L2:
+# ./examples/06_control_flow/switch_statement/switch_statement.c:13:             result = 30;
+	mov	DWORD PTR -4[rbp], 30	# result,
+# ./examples/06_control_flow/switch_statement/switch_statement.c:14:             break;
+	jmp	.L6	#
+.L3:
+# ./examples/06_control_flow/switch_statement/switch_statement.c:16:             result = 0;
+	mov	DWORD PTR -4[rbp], 0	# result,
+.L6:
+# ./examples/06_control_flow/switch_statement/switch_statement.c:19:     return result;
+	mov	eax, DWORD PTR -4[rbp]	# _7, result
+# ./examples/06_control_flow/switch_statement/switch_statement.c:20: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>While Loop</h2>
+        <div class="description">
+            <p>While loop demonstrating backward branching and loop conditions.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><strong>Loop Structure:</strong> Loops use labels and jump instructions to repeat code</li>
+<li><strong>Condition Check:</strong> The loop condition is checked before each iteration</li>
+<li><strong>Backward Jump:</strong> The jump instruction goes backward to the start of the loop</li>
+<li><strong>Loop Exit:</strong> When the condition fails, execution continues past the loop</li>
+</ul>
+<p class="reference">Reference: <a href="https://en.wikibooks.org/wiki/X86_Assembly/Control_Flow" target="_blank">Wikibooks - X86 Assembly Control Flow</a></p>
+        </div>
+        <div class="code-section c-code">
+            <h3>C Code</h3>
+            <pre><code>int main() {
+    int count = 0;
+    int i = 0;
+    
+    while (i &lt; 10) {
+        count += i;
+        i++;
+    }
+    
+    return count;
+}</code></pre>
+        </div>
+        <div class="code-section asm-code">
+            <h3>Assembly Code (Intel Syntax)</h3>
+            <pre><code>	.file	&quot;while_loop.c&quot;
+	.intel_syntax noprefix
+# GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	push	rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp	#,
+	.cfi_def_cfa_register 6
+# ./examples/06_control_flow/while_loop/while_loop.c:2:     int count = 0;
+	mov	DWORD PTR -4[rbp], 0	# count,
+# ./examples/06_control_flow/while_loop/while_loop.c:3:     int i = 0;
+	mov	DWORD PTR -8[rbp], 0	# i,
+# ./examples/06_control_flow/while_loop/while_loop.c:5:     while (i &lt; 10) {
+	jmp	.L2	#
+.L3:
+# ./examples/06_control_flow/while_loop/while_loop.c:6:         count += i;
+	mov	eax, DWORD PTR -8[rbp]	# tmp84, i
+	add	DWORD PTR -4[rbp], eax	# count, tmp84
+# ./examples/06_control_flow/while_loop/while_loop.c:7:         i++;
+	add	DWORD PTR -8[rbp], 1	# i,
+.L2:
+# ./examples/06_control_flow/while_loop/while_loop.c:5:     while (i &lt; 10) {
+	cmp	DWORD PTR -8[rbp], 9	# i,
+	jle	.L3	#,
+# ./examples/06_control_flow/while_loop/while_loop.c:10:     return count;
+	mov	eax, DWORD PTR -4[rbp]	# _5, count
+# ./examples/06_control_flow/while_loop/while_loop.c:11: }
+	pop	rbp	#
+	.cfi_def_cfa 7, 8
+	ret	
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
+	.section	.note.GNU-stack,&quot;&quot;,@progbits
+</code></pre>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Generated Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>
