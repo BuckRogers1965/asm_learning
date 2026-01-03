@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Resources - Assembly Learning</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; }
+        nav {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .resource-list {
+            list-style: none;
+            padding: 0;
+        }
+        .resource-list li {
+            margin: 15px 0;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 5px;
+        }
+        .resource-list a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        .resource-list a:hover {
+            text-decoration: underline;
+        }
+        .resource-list p {
+            margin: 5px 0 0 0;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Learning Resources</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+    </nav>
+
+    <div class="content">
+        <h2>Essential Assembly Concepts</h2>
+        <p>These external resources cover important topics that complement the code examples:</p>
+        
+        <ul class="resource-list">
+            <li>
+                <a href="https://en.wikipedia.org/wiki/X86#x86_registers" target="_blank">x86-64 Register Reference</a>
+                <p>Complete guide to general purpose registers, their sizes, and uses</p>
+            </li>
+            
+            <li>
+                <a href="https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI" target="_blank">x86-64 Calling Convention (System V ABI)</a>
+                <p>How functions pass arguments, which registers are preserved, and return values</p>
+            </li>
+            
+            <li>
+                <a href="https://en.wikipedia.org/wiki/Function_prologue_and_epilogue" target="_blank">Function Prologue and Epilogue</a>
+                <p>Understanding the standard function entry and exit sequences</p>
+            </li>
+            
+            <li>
+                <a href="https://textbook.cs161.org/memory-safety/x86.html" target="_blank">Stack Frames and Memory Layout (CS161)</a>
+                <p>How the stack is organized, stack frames, and memory safety</p>
+            </li>
+            
+            <li>
+                <a href="https://en.wikibooks.org/wiki/X86_Assembly/X86_Instructions" target="_blank">X86 Assembly Instructions Reference</a>
+                <p>Comprehensive list of assembly instructions with descriptions</p>
+            </li>
+            
+            <li>
+                <a href="https://en.wikibooks.org/wiki/X86_Assembly/Control_Flow" target="_blank">Control Flow in Assembly</a>
+                <p>Jumps, conditionals, loops, and branching explained</p>
+            </li>
+            
+            <li>
+                <a href="https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html" target="_blank">GCC: Using Assembly Language with C</a>
+                <p>Official GCC documentation on assembly generation and inline assembly</p>
+            </li>
+            
+            <li>
+                <a href="https://en.wikipedia.org/wiki/X86_memory_segmentation#Addressing_modes" target="_blank">Memory Addressing Modes</a>
+                <p>Direct, indirect, indexed, and scaled addressing explained</p>
+            </li>
+            
+            <li>
+                <a href="https://stackoverflow.com/questions/1658294/whats-the-purpose-of-the-lea-instruction" target="_blank">Understanding LEA (Load Effective Address)</a>
+                <p>Why LEA is used and how it differs from MOV</p>
+            </li>
+            
+            <li>
+                <a href="https://en.wikipedia.org/wiki/Data_structure_alignment" target="_blank">Data Structure Alignment and Padding</a>
+                <p>Why structures have padding and alignment requirements</p>
+            </li>
+            
+            <li>
+                <a href="https://www.felixcloutier.com/x86/" target="_blank">x86 and x86-64 Instruction Reference</a>
+                <p>Detailed technical reference for every x86 instruction</p>
+            </li>
+            
+            <li>
+                <a href="https://godbolt.org/" target="_blank">Compiler Explorer (Godbolt)</a>
+                <p>Interactive tool to see assembly output from multiple compilers</p>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h2>Why Use -O0 (No Optimization)?</h2>
+        <p>All examples in this tutorial are compiled with <code>-O0</code> (no optimization). This makes the assembly:</p>
+        <ul>
+            <li>Easier to read and understand</li>
+            <li>Closely match the structure of the C code</li>
+            <li>Show explicit stack operations and variable storage</li>
+            <li>Not optimized away or reordered</li>
+        </ul>
+        <p>Once you understand the basics, try compiling with <code>-O1</code>, <code>-O2</code>, and <code>-O3</code> to see how the compiler optimizes code!</p>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
+        <p>Assembly Learning Documentation</p>
+    </footer>
+</body>
+</html>
