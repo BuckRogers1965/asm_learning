@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitwise Operations - Assembly Learning</title>
+    <title>Basic Concepts - Assembly Learning</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,47 +76,48 @@
 </head>
 <body>
     <header>
-        <h1>Bitwise Operations</h1>
+        <h1>Basic Concepts</h1>
     </header>
     <nav>
         <a href="index.html">Home</a>
         <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
     </nav>
-<div class="example"><h2>Overview</h2><div class="description"><p>Bit manipulation and logical operations</p></div></div>
+<div class="example"><h2>Overview</h2><div class="description"><p>Fundamental assembly patterns for simple operations</p></div></div>
 
     <div class="example">
-        <h2>Bit Shifts</h2>
+        <h2>Hello World</h2>
         <div class="description">
-            <p>Left and right bit shift operations.</p>
+            <p>A simple "Hello, World!" program using printf. This example shows the basic structure of a C program and how function calls work in assembly.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Left Shift:</strong> The <code>shl</code> instruction shifts bits left (multiply by 2^n)</li>
-<li><strong>Right Shift:</strong> The <code>shr</code> instruction shifts bits right unsigned (divide by 2^n)</li>
-<li><strong>Arithmetic Shift:</strong> <code>sar</code> preserves the sign bit for signed integers</li>
-<li><strong>Shift Amount:</strong> Usually specified in the <code>cl</code> register or as immediate</li>
+<li><strong>Function Call Setup:</strong> Arguments are passed to functions using registers or the stack, depending on the calling convention</li>
+<li><strong>String Constants:</strong> The string literal is stored in the <code>.rodata</code> section (read-only data)</li>
+<li><strong>Return Value:</strong> Functions return values in the <code>eax</code>/<code>rax</code> register on x86/x64</li>
 </ul>
-<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Arithmetic_shift" target="_blank">Wikipedia - Arithmetic shift</a></p>
+<p class="reference">Reference: <a href="https://www.geeksforgeeks.org/cpp/convert-cc-code-to-assembly-language/" target="_blank">GeeksforGeeks - Convert C/C++ code to assembly language</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
-            <pre><code>int main() {
-    int x = 8;
-    
-    int left = x &lt;&lt; 2;   // 32 (multiply by 4)
-    int right = x &gt;&gt; 1;  // 4 (divide by 2)
-    
-    return left + right;
+            <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    printf(&quot;Hello, World!\n&quot;);
+    return 0;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;bit_shifts.c&quot;
+            <pre><code>	.file	&quot;hello_world.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
 
 # GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 # options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
+	.text
+	.section	.rodata
+.LC0:
+	.string	&quot;Hello, World!&quot;
 	.text
 	.globl	main
 	.type	main, @function
@@ -128,21 +129,13 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/08_bitwise/bit_shifts/bit_shifts.c:2:     int x = 8;
-	mov	DWORD PTR -4[rbp], 8	# x,
-# ./examples/08_bitwise/bit_shifts/bit_shifts.c:4:     int left = x &lt;&lt; 2;   // 32 (multiply by 4)
-	mov	eax, DWORD PTR -4[rbp]	# tmp87, x
-	sal	eax, 2	# tmp86,
-	mov	DWORD PTR -8[rbp], eax	# left, tmp86
-# ./examples/08_bitwise/bit_shifts/bit_shifts.c:5:     int right = x &gt;&gt; 1;  // 4 (divide by 2)
-	mov	eax, DWORD PTR -4[rbp]	# tmp91, x
-	sar	eax	# tmp90
-	mov	DWORD PTR -12[rbp], eax	# right, tmp90
-# ./examples/08_bitwise/bit_shifts/bit_shifts.c:7:     return left + right;
-	mov	edx, DWORD PTR -8[rbp]	# tmp92, left
-	mov	eax, DWORD PTR -12[rbp]	# tmp93, right
-	add	eax, edx	# _4, tmp92
-# ./examples/08_bitwise/bit_shifts/bit_shifts.c:8: }
+# ./examples/01_basics/hello_world/hello_world.c:4:     printf(&quot;Hello, World!\n&quot;);
+	lea	rax, .LC0[rip]	# tmp84,
+	mov	rdi, rax	#, tmp84
+	call	puts@PLT	#
+# ./examples/01_basics/hello_world/hello_world.c:5:     return 0;
+	mov	eax, 0	# _3,
+# ./examples/01_basics/hello_world/hello_world.c:6: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -156,34 +149,29 @@ main:
     </div>
 
     <div class="example">
-        <h2>Bitwise And Or</h2>
+        <h2>Variables</h2>
         <div class="description">
-            <p>Bitwise AND, OR, and XOR operations.</p>
+            <p>Basic variable declaration and arithmetic. This shows how local variables are allocated on the stack and how simple arithmetic operations translate to assembly instructions.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Bitwise AND:</strong> The <code>and</code> instruction performs bit-by-bit logical AND</li>
-<li><strong>Bitwise OR:</strong> The <code>or</code> instruction performs bit-by-bit logical OR</li>
-<li><strong>Bitwise XOR:</strong> The <code>xor</code> instruction performs bit-by-bit exclusive OR</li>
-<li><strong>Common Uses:</strong> Masking bits, setting flags, toggling bits</li>
+<li><strong>Stack Allocation:</strong> Local variables are stored on the stack, typically accessed via offsets from the base pointer (<code>rbp</code>)</li>
+<li><strong>Register Usage:</strong> The compiler uses registers for temporary calculations to improve performance</li>
+<li><strong>Arithmetic Instructions:</strong> Simple operations like addition compile to single instructions like <code>add</code> or <code>lea</code></li>
 </ul>
-<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Bitwise_operation" target="_blank">Wikipedia - Bitwise operation</a></p>
+<p class="reference">Reference: <a href="https://gist.github.com/lancejpollard/adf75b90137ef29e6f02" target="_blank">Simple C examples and their Assembly output from GCC</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
             <pre><code>int main() {
-    int a = 0b1010;  // 10
-    int b = 0b1100;  // 12
-    
-    int and_result = a &amp; b;  // 0b1000 = 8
-    int or_result = a | b;   // 0b1110 = 14
-    int xor_result = a ^ b;  // 0b0110 = 6
-    
-    return and_result + or_result + xor_result;
+    int a = 10;
+    int b = 20;
+    int c = a + b;
+    return c;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;bitwise_and_or.c&quot;
+            <pre><code>	.file	&quot;variables.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -201,30 +189,18 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:2:     int a = 0b1010;  // 10
+# ./examples/01_basics/variables/variables.c:2:     int a = 10;
 	mov	DWORD PTR -4[rbp], 10	# a,
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:3:     int b = 0b1100;  // 12
-	mov	DWORD PTR -8[rbp], 12	# b,
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:5:     int and_result = a &amp; b;  // 0b1000 = 8
-	mov	eax, DWORD PTR -4[rbp]	# tmp88, a
-	and	eax, DWORD PTR -8[rbp]	# tmp87, b
-	mov	DWORD PTR -12[rbp], eax	# and_result, tmp87
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:6:     int or_result = a | b;   // 0b1110 = 14
-	mov	eax, DWORD PTR -4[rbp]	# tmp92, a
-	or	eax, DWORD PTR -8[rbp]	# tmp91, b
-	mov	DWORD PTR -16[rbp], eax	# or_result, tmp91
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:7:     int xor_result = a ^ b;  // 0b0110 = 6
-	mov	eax, DWORD PTR -4[rbp]	# tmp96, a
-	xor	eax, DWORD PTR -8[rbp]	# tmp95, b
-	mov	DWORD PTR -20[rbp], eax	# xor_result, tmp95
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:9:     return and_result + or_result + xor_result;
-	mov	edx, DWORD PTR -12[rbp]	# tmp97, and_result
-	mov	eax, DWORD PTR -16[rbp]	# tmp98, or_result
-	add	edx, eax	# _1, tmp98
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:9:     return and_result + or_result + xor_result;
-	mov	eax, DWORD PTR -20[rbp]	# tmp99, xor_result
-	add	eax, edx	# _7, _1
-# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:10: }
+# ./examples/01_basics/variables/variables.c:3:     int b = 20;
+	mov	DWORD PTR -8[rbp], 20	# b,
+# ./examples/01_basics/variables/variables.c:4:     int c = a + b;
+	mov	edx, DWORD PTR -4[rbp]	# tmp88, a
+	mov	eax, DWORD PTR -8[rbp]	# tmp89, b
+	add	eax, edx	# tmp87, tmp88
+	mov	DWORD PTR -12[rbp], eax	# c, tmp87
+# ./examples/01_basics/variables/variables.c:5:     return c;
+	mov	eax, DWORD PTR -12[rbp]	# _4, c
+# ./examples/01_basics/variables/variables.c:6: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -239,6 +215,7 @@ main:
 
     <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
         <p>Generated Assembly Learning Documentation</p>
+        <p style="font-size: 0.9em;">Compiled with: gcc -S -masm=intel -O0 -fverbose-asm</p>
     </footer>
 </body>
 </html>

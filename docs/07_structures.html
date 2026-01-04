@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrays and Memory - Assembly Learning</title>
+    <title>Structures and Unions - Assembly Learning</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,41 +76,44 @@
 </head>
 <body>
     <header>
-        <h1>Arrays and Memory</h1>
+        <h1>Structures and Unions</h1>
     </header>
     <nav>
         <a href="index.html">Home</a>
         <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
     </nav>
-<div class="example"><h2>Overview</h2><div class="description"><p>Array initialization, access patterns, and memory layout</p></div></div>
+<div class="example"><h2>Overview</h2><div class="description"><p>Composite data types and their memory layout</p></div></div>
 
     <div class="example">
-        <h2>Array Initialization</h2>
+        <h2>Simple Struct</h2>
         <div class="description">
-            <p>Array initialization and how the compiler handles constant data.</p>
+            <p>Basic structure showing member access and memory layout.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Stack Allocation:</strong> Arrays are allocated on the stack with space reserved by adjusting the stack pointer</li>
-<li><strong>Initialization Loop:</strong> The compiler may use loops or direct moves to initialize array elements</li>
-<li><strong>Memory Layout:</strong> Array elements are stored contiguously in memory</li>
-<li><strong>Alignment:</strong> Arrays may be aligned to word boundaries for performance</li>
+<li><strong>Struct Layout:</strong> Members are laid out sequentially in memory</li>
+<li><strong>Member Access:</strong> Accessing members uses fixed offsets from the struct base address</li>
+<li><strong>Padding:</strong> The compiler may insert padding between members for alignment</li>
+<li><strong>Stack Allocation:</strong> Struct instances on the stack are allocated like arrays</li>
 </ul>
 <p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Data_structure_alignment" target="_blank">Wikipedia - Data structure alignment</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
-            <pre><code>int main() {
-    int arr[5] = {10, 20, 30, 40, 50};
-    int sum = 0;
-    for (int i = 0; i &lt; 5; i++) {
-        sum += arr[i];
-    }
-    return sum;
+            <pre><code>struct Point {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Point p;
+    p.x = 10;
+    p.y = 20;
+    return p.x + p.y;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;array_initialization.c&quot;
+            <pre><code>	.file	&quot;simple_struct.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -128,34 +131,17 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/05_arrays/array_initialization/array_initialization.c:2:     int arr[5] = {10, 20, 30, 40, 50};
-	mov	DWORD PTR -32[rbp], 10	# arr[0],
-	mov	DWORD PTR -28[rbp], 20	# arr[1],
-	mov	DWORD PTR -24[rbp], 30	# arr[2],
-	mov	DWORD PTR -20[rbp], 40	# arr[3],
-	mov	DWORD PTR -16[rbp], 50	# arr[4],
-# ./examples/05_arrays/array_initialization/array_initialization.c:3:     int sum = 0;
-	mov	DWORD PTR -4[rbp], 0	# sum,
-# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
-	mov	DWORD PTR -8[rbp], 0	# i,
-# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
-	jmp	.L2	#
-.L3:
-# ./examples/05_arrays/array_initialization/array_initialization.c:5:         sum += arr[i];
-	mov	eax, DWORD PTR -8[rbp]	# tmp86, i
-	cdqe
-	mov	eax, DWORD PTR -32[rbp+rax*4]	# _1, arr[i_3]
-# ./examples/05_arrays/array_initialization/array_initialization.c:5:         sum += arr[i];
-	add	DWORD PTR -4[rbp], eax	# sum, _1
-# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
-	add	DWORD PTR -8[rbp], 1	# i,
-.L2:
-# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
-	cmp	DWORD PTR -8[rbp], 4	# i,
-	jle	.L3	#,
-# ./examples/05_arrays/array_initialization/array_initialization.c:7:     return sum;
-	mov	eax, DWORD PTR -4[rbp]	# _12, sum
-# ./examples/05_arrays/array_initialization/array_initialization.c:8: }
+# ./examples/07_structures/simple_struct/simple_struct.c:8:     p.x = 10;
+	mov	DWORD PTR -8[rbp], 10	# p.x,
+# ./examples/07_structures/simple_struct/simple_struct.c:9:     p.y = 20;
+	mov	DWORD PTR -4[rbp], 20	# p.y,
+# ./examples/07_structures/simple_struct/simple_struct.c:10:     return p.x + p.y;
+	mov	edx, DWORD PTR -8[rbp]	# _1, p.x
+# ./examples/07_structures/simple_struct/simple_struct.c:10:     return p.x + p.y;
+	mov	eax, DWORD PTR -4[rbp]	# _2, p.y
+# ./examples/07_structures/simple_struct/simple_struct.c:10:     return p.x + p.y;
+	add	eax, edx	# _6, _1
+# ./examples/07_structures/simple_struct/simple_struct.c:11: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -169,32 +155,34 @@ main:
     </div>
 
     <div class="example">
-        <h2>Multidimensional Array</h2>
+        <h2>Struct Pointer</h2>
         <div class="description">
-            <p>Two-dimensional arrays and row-major order storage.</p>
+            <p>Accessing struct members through pointers.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Row-Major Order:</strong> C stores 2D arrays in row-major order (all elements of row 0, then row 1, etc.)</li>
-<li><strong>Index Calculation:</strong> Element [i][j] is at offset (i * num_columns + j) * element_size</li>
-<li><strong>Nested Loops:</strong> Accessing 2D arrays typically uses nested loops in assembly</li>
-<li><strong>Cache Efficiency:</strong> Row-major access patterns are more cache-friendly</li>
+<li><strong>Arrow Operator:</strong> The <code>-></code> operator dereferences the pointer and accesses the member</li>
+<li><strong>Address Calculation:</strong> Member access adds the offset to the pointer value</li>
+<li><strong>Indirect Access:</strong> The assembly uses the pointer register plus offset</li>
+<li><strong>Equivalent Operations:</strong> <code>ptr->member</code> is equivalent to <code>(*ptr).member</code></li>
 </ul>
-<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order" target="_blank">Wikipedia - Row and column-major order</a></p>
+<p class="reference">Reference: <a href="https://www.geeksforgeeks.org/structure-member-alignment-padding-and-data-packing/" target="_blank">GeeksforGeeks - Structure member alignment and padding</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
-            <pre><code>int main() {
-    int matrix[2][3] = {
-        {1, 2, 3},
-        {4, 5, 6}
-    };
-    int sum = matrix[0][1] + matrix[1][2];
-    return sum;
+            <pre><code>struct Point {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Point p = {5, 10};
+    struct Point *ptr = &amp;p;
+    return ptr-&gt;x + ptr-&gt;y;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;multidimensional_array.c&quot;
+            <pre><code>	.file	&quot;struct_pointer.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -212,23 +200,21 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:2:     int matrix[2][3] = {
-	mov	DWORD PTR -32[rbp], 1	# matrix[0][0],
-	mov	DWORD PTR -28[rbp], 2	# matrix[0][1],
-	mov	DWORD PTR -24[rbp], 3	# matrix[0][2],
-	mov	DWORD PTR -20[rbp], 4	# matrix[1][0],
-	mov	DWORD PTR -16[rbp], 5	# matrix[1][1],
-	mov	DWORD PTR -12[rbp], 6	# matrix[1][2],
-# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
-	mov	edx, DWORD PTR -28[rbp]	# _1, matrix[0][1]
-# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
-	mov	eax, DWORD PTR -12[rbp]	# _2, matrix[1][2]
-# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
-	add	eax, edx	# tmp86, _1
-	mov	DWORD PTR -4[rbp], eax	# sum, tmp86
-# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:7:     return sum;
-	mov	eax, DWORD PTR -4[rbp]	# _11, sum
-# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:8: }
+# ./examples/07_structures/struct_pointer/struct_pointer.c:7:     struct Point p = {5, 10};
+	mov	DWORD PTR -16[rbp], 5	# p.x,
+	mov	DWORD PTR -12[rbp], 10	# p.y,
+# ./examples/07_structures/struct_pointer/struct_pointer.c:8:     struct Point *ptr = &amp;p;
+	lea	rax, -16[rbp]	# tmp86,
+	mov	QWORD PTR -8[rbp], rax	# ptr, tmp86
+# ./examples/07_structures/struct_pointer/struct_pointer.c:9:     return ptr-&gt;x + ptr-&gt;y;
+	mov	rax, QWORD PTR -8[rbp]	# tmp87, ptr
+	mov	edx, DWORD PTR [rax]	# _1, ptr_6-&gt;x
+# ./examples/07_structures/struct_pointer/struct_pointer.c:9:     return ptr-&gt;x + ptr-&gt;y;
+	mov	rax, QWORD PTR -8[rbp]	# tmp88, ptr
+	mov	eax, DWORD PTR 4[rax]	# _2, ptr_6-&gt;y
+# ./examples/07_structures/struct_pointer/struct_pointer.c:9:     return ptr-&gt;x + ptr-&gt;y;
+	add	eax, edx	# _7, _1
+# ./examples/07_structures/struct_pointer/struct_pointer.c:10: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -243,6 +229,7 @@ main:
 
     <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
         <p>Generated Assembly Learning Documentation</p>
+        <p style="font-size: 0.9em;">Compiled with: gcc -S -masm=intel -O0 -fverbose-asm</p>
     </footer>
 </body>
 </html>

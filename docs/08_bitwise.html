@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pointers - Assembly Learning</title>
+    <title>Bitwise Operations - Assembly Learning</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,39 +76,41 @@
 </head>
 <body>
     <header>
-        <h1>Pointers</h1>
+        <h1>Bitwise Operations</h1>
     </header>
     <nav>
         <a href="index.html">Home</a>
         <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
     </nav>
-<div class="example"><h2>Overview</h2><div class="description"><p>Memory addresses, pointer operations, and indirect memory access</p></div></div>
+<div class="example"><h2>Overview</h2><div class="description"><p>Bit manipulation and logical operations</p></div></div>
 
     <div class="example">
-        <h2>Pointer Arithmetic</h2>
+        <h2>Bit Shifts</h2>
         <div class="description">
-            <p>Array access using pointer arithmetic. In C, <code>arr[i]</code> is equivalent to <code>*(arr + i)</code>.</p>
+            <p>Left and right bit shift operations.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Array to Pointer Decay:</strong> Array names automatically convert to pointers to their first element</li>
-<li><strong>Pointer Arithmetic:</strong> Adding to a pointer moves by (number × element size) bytes</li>
-<li><strong>Scaled Indexing:</strong> Modern x86 processors have addressing modes that combine base + offset × scale in one instruction</li>
-<li><strong>Memory Layout:</strong> Arrays are stored as contiguous blocks in memory, enabling efficient sequential access</li>
+<li><strong>Left Shift:</strong> The <code>shl</code> instruction shifts bits left (multiply by 2^n)</li>
+<li><strong>Right Shift:</strong> The <code>shr</code> instruction shifts bits right unsigned (divide by 2^n)</li>
+<li><strong>Arithmetic Shift:</strong> <code>sar</code> preserves the sign bit for signed integers</li>
+<li><strong>Shift Amount:</strong> Usually specified in the <code>cl</code> register or as immediate</li>
 </ul>
-<p class="reference">Reference: <a href="https://idea.popcount.org/2013-07-16-baby-steps-in-x86-assembly/" target="_blank">Baby steps in x86 assembly</a></p>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Arithmetic_shift" target="_blank">Wikipedia - Arithmetic shift</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
             <pre><code>int main() {
-    int arr[5] = {1, 2, 3, 4, 5};
-    int *ptr = arr;
-    int second = *(ptr + 1);
-    return second;
+    int x = 8;
+    
+    int left = x &lt;&lt; 2;   // 32 (multiply by 4)
+    int right = x &gt;&gt; 1;  // 4 (divide by 2)
+    
+    return left + right;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;pointer_arithmetic.c&quot;
+            <pre><code>	.file	&quot;bit_shifts.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -126,22 +128,21 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:2:     int arr[5] = {1, 2, 3, 4, 5};
-	mov	DWORD PTR -32[rbp], 1	# arr[0],
-	mov	DWORD PTR -28[rbp], 2	# arr[1],
-	mov	DWORD PTR -24[rbp], 3	# arr[2],
-	mov	DWORD PTR -20[rbp], 4	# arr[3],
-	mov	DWORD PTR -16[rbp], 5	# arr[4],
-# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:3:     int *ptr = arr;
-	lea	rax, -32[rbp]	# tmp84,
-	mov	QWORD PTR -8[rbp], rax	# ptr, tmp84
-# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:4:     int second = *(ptr + 1);
-	mov	rax, QWORD PTR -8[rbp]	# tmp85, ptr
-	mov	eax, DWORD PTR 4[rax]	# tmp86, MEM[(int *)ptr_7 + 4B]
-	mov	DWORD PTR -12[rbp], eax	# second, tmp86
-# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:5:     return second;
-	mov	eax, DWORD PTR -12[rbp]	# _9, second
-# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:6: }
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:2:     int x = 8;
+	mov	DWORD PTR -4[rbp], 8	# x,
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:4:     int left = x &lt;&lt; 2;   // 32 (multiply by 4)
+	mov	eax, DWORD PTR -4[rbp]	# tmp87, x
+	sal	eax, 2	# tmp86,
+	mov	DWORD PTR -8[rbp], eax	# left, tmp86
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:5:     int right = x &gt;&gt; 1;  // 4 (divide by 2)
+	mov	eax, DWORD PTR -4[rbp]	# tmp91, x
+	sar	eax	# tmp90
+	mov	DWORD PTR -12[rbp], eax	# right, tmp90
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:7:     return left + right;
+	mov	edx, DWORD PTR -8[rbp]	# tmp92, left
+	mov	eax, DWORD PTR -12[rbp]	# tmp93, right
+	add	eax, edx	# _4, tmp92
+# ./examples/08_bitwise/bit_shifts/bit_shifts.c:8: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -155,30 +156,34 @@ main:
     </div>
 
     <div class="example">
-        <h2>Pointer Basics</h2>
+        <h2>Bitwise And Or</h2>
         <div class="description">
-            <p>Basic pointer operations: taking the address of a variable (<code>&</code>) and dereferencing (<code>*</code>).</p>
+            <p>Bitwise AND, OR, and XOR operations.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Memory Addresses:</strong> Variables are stored at memory locations; pointers hold these addresses</li>
-<li><strong>Address-of Operator (<code>&</code>):</strong> Compiles to the <code>lea</code> (load effective address) instruction</li>
-<li><strong>Dereference Operator (<code>*</code>):</strong> Compiles to a <code>mov</code> instruction that reads from the memory address</li>
-<li><strong>Pointer Variables:</strong> Stored on the stack just like regular variables, but contain addresses</li>
+<li><strong>Bitwise AND:</strong> The <code>and</code> instruction performs bit-by-bit logical AND</li>
+<li><strong>Bitwise OR:</strong> The <code>or</code> instruction performs bit-by-bit logical OR</li>
+<li><strong>Bitwise XOR:</strong> The <code>xor</code> instruction performs bit-by-bit exclusive OR</li>
+<li><strong>Common Uses:</strong> Masking bits, setting flags, toggling bits</li>
 </ul>
-<p class="reference">Reference: <a href="https://lindevs.com/generate-assembly-code-using-gcc-or-g-compiler" target="_blank">Lindevs - Generate Assembly Code using gcc</a></p>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Bitwise_operation" target="_blank">Wikipedia - Bitwise operation</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
             <pre><code>int main() {
-    int x = 42;
-    int *ptr = &amp;x;
-    int y = *ptr;
-    return y;
+    int a = 0b1010;  // 10
+    int b = 0b1100;  // 12
+    
+    int and_result = a &amp; b;  // 0b1000 = 8
+    int or_result = a | b;   // 0b1110 = 14
+    int xor_result = a ^ b;  // 0b0110 = 6
+    
+    return and_result + or_result + xor_result;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;pointer_basics.c&quot;
+            <pre><code>	.file	&quot;bitwise_and_or.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -196,18 +201,30 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/04_pointers/pointer_basics/pointer_basics.c:2:     int x = 42;
-	mov	DWORD PTR -16[rbp], 42	# x,
-# ./examples/04_pointers/pointer_basics/pointer_basics.c:3:     int *ptr = &amp;x;
-	lea	rax, -16[rbp]	# tmp84,
-	mov	QWORD PTR -8[rbp], rax	# ptr, tmp84
-# ./examples/04_pointers/pointer_basics/pointer_basics.c:4:     int y = *ptr;
-	mov	rax, QWORD PTR -8[rbp]	# tmp85, ptr
-	mov	eax, DWORD PTR [rax]	# tmp86, *ptr_3
-	mov	DWORD PTR -12[rbp], eax	# y, tmp86
-# ./examples/04_pointers/pointer_basics/pointer_basics.c:5:     return y;
-	mov	eax, DWORD PTR -12[rbp]	# _5, y
-# ./examples/04_pointers/pointer_basics/pointer_basics.c:6: }
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:2:     int a = 0b1010;  // 10
+	mov	DWORD PTR -4[rbp], 10	# a,
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:3:     int b = 0b1100;  // 12
+	mov	DWORD PTR -8[rbp], 12	# b,
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:5:     int and_result = a &amp; b;  // 0b1000 = 8
+	mov	eax, DWORD PTR -4[rbp]	# tmp88, a
+	and	eax, DWORD PTR -8[rbp]	# tmp87, b
+	mov	DWORD PTR -12[rbp], eax	# and_result, tmp87
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:6:     int or_result = a | b;   // 0b1110 = 14
+	mov	eax, DWORD PTR -4[rbp]	# tmp92, a
+	or	eax, DWORD PTR -8[rbp]	# tmp91, b
+	mov	DWORD PTR -16[rbp], eax	# or_result, tmp91
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:7:     int xor_result = a ^ b;  // 0b0110 = 6
+	mov	eax, DWORD PTR -4[rbp]	# tmp96, a
+	xor	eax, DWORD PTR -8[rbp]	# tmp95, b
+	mov	DWORD PTR -20[rbp], eax	# xor_result, tmp95
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:9:     return and_result + or_result + xor_result;
+	mov	edx, DWORD PTR -12[rbp]	# tmp97, and_result
+	mov	eax, DWORD PTR -16[rbp]	# tmp98, or_result
+	add	edx, eax	# _1, tmp98
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:9:     return and_result + or_result + xor_result;
+	mov	eax, DWORD PTR -20[rbp]	# tmp99, xor_result
+	add	eax, edx	# _7, _1
+# ./examples/08_bitwise/bitwise_and_or/bitwise_and_or.c:10: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -222,6 +239,7 @@ main:
 
     <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
         <p>Generated Assembly Learning Documentation</p>
+        <p style="font-size: 0.9em;">Compiled with: gcc -S -masm=intel -O0 -fverbose-asm</p>
     </footer>
 </body>
 </html>

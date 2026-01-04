@@ -25,7 +25,7 @@ class AssemblyLearningGenerator:
         self.base_dir = Path(__file__).parent
         self.examples_dir = self.base_dir / "examples"
         self.templates_dir = self.base_dir / "templates"
-        self.html_output_dir = self.base_dir / "html_output"
+        self.html_output_dir = self.base_dir / "docs"
         
     def compile_example(self, c_file: Path) -> str:
         """Compile C file to assembly with verbose output"""
@@ -194,6 +194,9 @@ class AssemblyLearningGenerator:
         <h2>Welcome to Assembly Language Learning</h2>
         <div class="description">
             <p>This documentation demonstrates how C code compiles to assembly language. Each example shows the C source code alongside the generated assembly code with verbose comments explaining the compiler's choices.</p>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                <a href="https://github.com/buckrogers1965/asm_learning" target="_blank" style="display:inline-block; background:#24292e; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-weight:bold;">View Project Code on GitHub</a> </div>
             
             <h3>How to Use This Guide</h3>
             <p>Each example includes:</p>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Functions - Assembly Learning</title>
+    <title>Pointers - Assembly Learning</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,41 +76,39 @@
 </head>
 <body>
     <header>
-        <h1>Functions</h1>
+        <h1>Pointers</h1>
     </header>
     <nav>
         <a href="index.html">Home</a>
         <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
     </nav>
-<div class="example"><h2>Overview</h2><div class="description"><p>Function calls, parameters, and return values - understanding the calling convention</p></div></div>
+<div class="example"><h2>Overview</h2><div class="description"><p>Memory addresses, pointer operations, and indirect memory access</p></div></div>
 
     <div class="example">
-        <h2>Recursive</h2>
+        <h2>Pointer Arithmetic</h2>
         <div class="description">
-            <p>A recursive function computing factorial. This shows how the stack builds up with multiple function calls and how each call maintains its own stack frame.</p>
+            <p>Array access using pointer arithmetic. In C, <code>arr[i]</code> is equivalent to <code>*(arr + i)</code>.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Stack Frames:</strong> Each function call creates a new stack frame containing local variables and the return address</li>
-<li><strong>Recursion:</strong> The function calls itself, creating nested stack frames that unwind as the recursion completes</li>
-<li><strong>Base Case:</strong> The conditional check that stops the recursion translates to a compare and conditional jump</li>
-<li><strong>Call Stack:</strong> The <code>call</code> instruction pushes the return address onto the stack; <code>ret</code> pops it and jumps back</li>
+<li><strong>Array to Pointer Decay:</strong> Array names automatically convert to pointers to their first element</li>
+<li><strong>Pointer Arithmetic:</strong> Adding to a pointer moves by (number × element size) bytes</li>
+<li><strong>Scaled Indexing:</strong> Modern x86 processors have addressing modes that combine base + offset × scale in one instruction</li>
+<li><strong>Memory Layout:</strong> Arrays are stored as contiguous blocks in memory, enabling efficient sequential access</li>
 </ul>
-<p class="reference">References: <a href="https://textbook.cs161.org/memory-safety/x86.html" target="_blank">CS161 - x86 Assembly and Call Stack</a>, <a href="https://www.learnvulnerabilityresearch.com/stack-frame-function-prologue" target="_blank">Learn Vulnerability Research - Stack Frame</a></p>
+<p class="reference">Reference: <a href="https://idea.popcount.org/2013-07-16-baby-steps-in-x86-assembly/" target="_blank">Baby steps in x86 assembly</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
-            <pre><code>int factorial(int n) {
-    if (n &lt;= 1) return 1;
-    return n * factorial(n - 1);
-}
-
-int main() {
-    return factorial(5);
+            <pre><code>int main() {
+    int arr[5] = {1, 2, 3, 4, 5};
+    int *ptr = arr;
+    int second = *(ptr + 1);
+    return second;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;recursive.c&quot;
+            <pre><code>	.file	&quot;pointer_arithmetic.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -118,9 +116,9 @@ int main() {
 # GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 # options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
 	.text
-	.globl	factorial
-	.type	factorial, @function
-factorial:
+	.globl	main
+	.type	main, @function
+main:
 .LFB0:
 	.cfi_startproc
 	push	rbp	#
@@ -128,49 +126,27 @@ factorial:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-	sub	rsp, 16	#,
-	mov	DWORD PTR -4[rbp], edi	# n, n
-# ./examples/02_functions/recursive/recursive.c:2:     if (n &lt;= 1) return 1;
-	cmp	DWORD PTR -4[rbp], 1	# n,
-	jg	.L2	#,
-# ./examples/02_functions/recursive/recursive.c:2:     if (n &lt;= 1) return 1;
-	mov	eax, 1	# _3,
-	jmp	.L3	#
-.L2:
-# ./examples/02_functions/recursive/recursive.c:3:     return n * factorial(n - 1);
-	mov	eax, DWORD PTR -4[rbp]	# tmp86, n
-	sub	eax, 1	# _1,
-	mov	edi, eax	#, _1
-	call	factorial	#
-# ./examples/02_functions/recursive/recursive.c:3:     return n * factorial(n - 1);
-	imul	eax, DWORD PTR -4[rbp]	# _3, n
-.L3:
-# ./examples/02_functions/recursive/recursive.c:4: }
-	leave	
-	.cfi_def_cfa 7, 8
-	ret	
-	.cfi_endproc
-.LFE0:
-	.size	factorial, .-factorial
-	.globl	main
-	.type	main, @function
-main:
-.LFB1:
-	.cfi_startproc
-	push	rbp	#
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp	#,
-	.cfi_def_cfa_register 6
-# ./examples/02_functions/recursive/recursive.c:7:     return factorial(5);
-	mov	edi, 5	#,
-	call	factorial	#
-# ./examples/02_functions/recursive/recursive.c:8: }
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:2:     int arr[5] = {1, 2, 3, 4, 5};
+	mov	DWORD PTR -32[rbp], 1	# arr[0],
+	mov	DWORD PTR -28[rbp], 2	# arr[1],
+	mov	DWORD PTR -24[rbp], 3	# arr[2],
+	mov	DWORD PTR -20[rbp], 4	# arr[3],
+	mov	DWORD PTR -16[rbp], 5	# arr[4],
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:3:     int *ptr = arr;
+	lea	rax, -32[rbp]	# tmp84,
+	mov	QWORD PTR -8[rbp], rax	# ptr, tmp84
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:4:     int second = *(ptr + 1);
+	mov	rax, QWORD PTR -8[rbp]	# tmp85, ptr
+	mov	eax, DWORD PTR 4[rax]	# tmp86, MEM[(int *)ptr_7 + 4B]
+	mov	DWORD PTR -12[rbp], eax	# second, tmp86
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:5:     return second;
+	mov	eax, DWORD PTR -12[rbp]	# _9, second
+# ./examples/04_pointers/pointer_arithmetic/pointer_arithmetic.c:6: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
 	.cfi_endproc
-.LFE1:
+.LFE0:
 	.size	main, .-main
 	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
 	.section	.note.GNU-stack,&quot;&quot;,@progbits
@@ -179,32 +155,30 @@ main:
     </div>
 
     <div class="example">
-        <h2>Simple Function</h2>
+        <h2>Pointer Basics</h2>
         <div class="description">
-            <p>A simple function with parameters and a return value. This demonstrates the x86-64 calling convention where arguments are passed in registers.</p>
+            <p>Basic pointer operations: taking the address of a variable (<code>&</code>) and dereferencing (<code>*</code>).</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Argument Passing:</strong> On x86-64, the first six integer arguments are passed in registers: <code>rdi</code>, <code>rsi</code>, <code>rdx</code>, <code>rcx</code>, <code>r8</code>, <code>r9</code></li>
-<li><strong>Function Prologue:</strong> The standard entry sequence that sets up the stack frame (<code>push rbp; mov rbp, rsp</code>)</li>
-<li><strong>Function Epilogue:</strong> The exit sequence that cleans up and returns (<code>pop rbp; ret</code>)</li>
-<li><strong>Return Values:</strong> Integer return values go in <code>rax</code> (32-bit values use <code>eax</code>)</li>
+<li><strong>Memory Addresses:</strong> Variables are stored at memory locations; pointers hold these addresses</li>
+<li><strong>Address-of Operator (<code>&</code>):</strong> Compiles to the <code>lea</code> (load effective address) instruction</li>
+<li><strong>Dereference Operator (<code>*</code>):</strong> Compiles to a <code>mov</code> instruction that reads from the memory address</li>
+<li><strong>Pointer Variables:</strong> Stored on the stack just like regular variables, but contain addresses</li>
 </ul>
-<p class="reference">References: <a href="https://en.wikipedia.org/wiki/Function_prologue_and_epilogue" target="_blank">Wikipedia - Function prologue and epilogue</a>, <a href="https://www.sanfoundry.com/c-tutorials-prologue-epilogue-terms-context-functions-program/" target="_blank">Sanfoundry - Function Prologue and Epilogue</a></p>
+<p class="reference">Reference: <a href="https://lindevs.com/generate-assembly-code-using-gcc-or-g-compiler" target="_blank">Lindevs - Generate Assembly Code using gcc</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
-            <pre><code>int add(int a, int b) {
-    return a + b;
-}
-
-int main() {
-    int result = add(5, 3);
-    return result;
+            <pre><code>int main() {
+    int x = 42;
+    int *ptr = &amp;x;
+    int y = *ptr;
+    return y;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;simple_function.c&quot;
+            <pre><code>	.file	&quot;pointer_basics.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -212,9 +186,9 @@ int main() {
 # GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 # options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
 	.text
-	.globl	add
-	.type	add, @function
-add:
+	.globl	main
+	.type	main, @function
+main:
 .LFB0:
 	.cfi_startproc
 	push	rbp	#
@@ -222,43 +196,23 @@ add:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-	mov	DWORD PTR -4[rbp], edi	# a, a
-	mov	DWORD PTR -8[rbp], esi	# b, b
-# ./examples/02_functions/simple_function/simple_function.c:2:     return a + b;
-	mov	edx, DWORD PTR -4[rbp]	# tmp84, a
-	mov	eax, DWORD PTR -8[rbp]	# tmp85, b
-	add	eax, edx	# _3, tmp84
-# ./examples/02_functions/simple_function/simple_function.c:3: }
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:2:     int x = 42;
+	mov	DWORD PTR -16[rbp], 42	# x,
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:3:     int *ptr = &amp;x;
+	lea	rax, -16[rbp]	# tmp84,
+	mov	QWORD PTR -8[rbp], rax	# ptr, tmp84
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:4:     int y = *ptr;
+	mov	rax, QWORD PTR -8[rbp]	# tmp85, ptr
+	mov	eax, DWORD PTR [rax]	# tmp86, *ptr_3
+	mov	DWORD PTR -12[rbp], eax	# y, tmp86
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:5:     return y;
+	mov	eax, DWORD PTR -12[rbp]	# _5, y
+# ./examples/04_pointers/pointer_basics/pointer_basics.c:6: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
 	.cfi_endproc
 .LFE0:
-	.size	add, .-add
-	.globl	main
-	.type	main, @function
-main:
-.LFB1:
-	.cfi_startproc
-	push	rbp	#
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp	#,
-	.cfi_def_cfa_register 6
-	sub	rsp, 16	#,
-# ./examples/02_functions/simple_function/simple_function.c:6:     int result = add(5, 3);
-	mov	esi, 3	#,
-	mov	edi, 5	#,
-	call	add	#
-	mov	DWORD PTR -4[rbp], eax	# result, tmp84
-# ./examples/02_functions/simple_function/simple_function.c:7:     return result;
-	mov	eax, DWORD PTR -4[rbp]	# _4, result
-# ./examples/02_functions/simple_function/simple_function.c:8: }
-	leave	
-	.cfi_def_cfa 7, 8
-	ret	
-	.cfi_endproc
-.LFE1:
 	.size	main, .-main
 	.ident	&quot;GCC: (Debian 12.2.0-14+deb12u1) 12.2.0&quot;
 	.section	.note.GNU-stack,&quot;&quot;,@progbits
@@ -268,6 +222,7 @@ main:
 
     <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
         <p>Generated Assembly Learning Documentation</p>
+        <p style="font-size: 0.9em;">Compiled with: gcc -S -masm=intel -O0 -fverbose-asm</p>
     </footer>
 </body>
 </html>

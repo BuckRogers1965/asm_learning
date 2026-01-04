@@ -3,6 +3,8 @@
 This system helps you learn assembly language by compiling simple C programs
 and viewing the generated assembly code side-by-side.
 
+(This is live on github pages)[https://buckrogers1965.github.io/asm_lessons]
+
 ## Quick Start
 
 1. Generate HTML documentation:

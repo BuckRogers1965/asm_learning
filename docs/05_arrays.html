@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic Concepts - Assembly Learning</title>
+    <title>Arrays and Memory - Assembly Learning</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -76,48 +76,47 @@
 </head>
 <body>
     <header>
-        <h1>Basic Concepts</h1>
+        <h1>Arrays and Memory</h1>
     </header>
     <nav>
         <a href="index.html">Home</a>
         <a href="01_basics.html">Basic Concepts</a> | <a href="02_functions.html">Functions</a> | <a href="03_system_calls.html">System Calls</a> | <a href="04_pointers.html">Pointers</a> | <a href="05_arrays.html">Arrays and Memory</a> | <a href="06_control_flow.html">Control Flow</a> | <a href="07_structures.html">Structures and Unions</a> | <a href="08_bitwise.html">Bitwise Operations</a> | <a href="09_strings.html">String Operations</a> | <a href="10_advanced.html">Advanced Concepts</a>
     </nav>
-<div class="example"><h2>Overview</h2><div class="description"><p>Fundamental assembly patterns for simple operations</p></div></div>
+<div class="example"><h2>Overview</h2><div class="description"><p>Array initialization, access patterns, and memory layout</p></div></div>
 
     <div class="example">
-        <h2>Hello World</h2>
+        <h2>Array Initialization</h2>
         <div class="description">
-            <p>A simple "Hello, World!" program using printf. This example shows the basic structure of a C program and how function calls work in assembly.</p>
+            <p>Array initialization and how the compiler handles constant data.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Function Call Setup:</strong> Arguments are passed to functions using registers or the stack, depending on the calling convention</li>
-<li><strong>String Constants:</strong> The string literal is stored in the <code>.rodata</code> section (read-only data)</li>
-<li><strong>Return Value:</strong> Functions return values in the <code>eax</code>/<code>rax</code> register on x86/x64</li>
+<li><strong>Stack Allocation:</strong> Arrays are allocated on the stack with space reserved by adjusting the stack pointer</li>
+<li><strong>Initialization Loop:</strong> The compiler may use loops or direct moves to initialize array elements</li>
+<li><strong>Memory Layout:</strong> Array elements are stored contiguously in memory</li>
+<li><strong>Alignment:</strong> Arrays may be aligned to word boundaries for performance</li>
 </ul>
-<p class="reference">Reference: <a href="https://www.geeksforgeeks.org/cpp/convert-cc-code-to-assembly-language/" target="_blank">GeeksforGeeks - Convert C/C++ code to assembly language</a></p>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Data_structure_alignment" target="_blank">Wikipedia - Data structure alignment</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
-            <pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    printf(&quot;Hello, World!\n&quot;);
-    return 0;
+            <pre><code>int main() {
+    int arr[5] = {10, 20, 30, 40, 50};
+    int sum = 0;
+    for (int i = 0; i &lt; 5; i++) {
+        sum += arr[i];
+    }
+    return sum;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;hello_world.c&quot;
+            <pre><code>	.file	&quot;array_initialization.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
 
 # GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 # options passed: -masm=intel -mtune=generic -march=x86-64 -O0 -fasynchronous-unwind-tables
-	.text
-	.section	.rodata
-.LC0:
-	.string	&quot;Hello, World!&quot;
 	.text
 	.globl	main
 	.type	main, @function
@@ -129,13 +128,34 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/01_basics/hello_world/hello_world.c:4:     printf(&quot;Hello, World!\n&quot;);
-	lea	rax, .LC0[rip]	# tmp84,
-	mov	rdi, rax	#, tmp84
-	call	puts@PLT	#
-# ./examples/01_basics/hello_world/hello_world.c:5:     return 0;
-	mov	eax, 0	# _3,
-# ./examples/01_basics/hello_world/hello_world.c:6: }
+# ./examples/05_arrays/array_initialization/array_initialization.c:2:     int arr[5] = {10, 20, 30, 40, 50};
+	mov	DWORD PTR -32[rbp], 10	# arr[0],
+	mov	DWORD PTR -28[rbp], 20	# arr[1],
+	mov	DWORD PTR -24[rbp], 30	# arr[2],
+	mov	DWORD PTR -20[rbp], 40	# arr[3],
+	mov	DWORD PTR -16[rbp], 50	# arr[4],
+# ./examples/05_arrays/array_initialization/array_initialization.c:3:     int sum = 0;
+	mov	DWORD PTR -4[rbp], 0	# sum,
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	mov	DWORD PTR -8[rbp], 0	# i,
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	jmp	.L2	#
+.L3:
+# ./examples/05_arrays/array_initialization/array_initialization.c:5:         sum += arr[i];
+	mov	eax, DWORD PTR -8[rbp]	# tmp86, i
+	cdqe
+	mov	eax, DWORD PTR -32[rbp+rax*4]	# _1, arr[i_3]
+# ./examples/05_arrays/array_initialization/array_initialization.c:5:         sum += arr[i];
+	add	DWORD PTR -4[rbp], eax	# sum, _1
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	add	DWORD PTR -8[rbp], 1	# i,
+.L2:
+# ./examples/05_arrays/array_initialization/array_initialization.c:4:     for (int i = 0; i &lt; 5; i++) {
+	cmp	DWORD PTR -8[rbp], 4	# i,
+	jle	.L3	#,
+# ./examples/05_arrays/array_initialization/array_initialization.c:7:     return sum;
+	mov	eax, DWORD PTR -4[rbp]	# _12, sum
+# ./examples/05_arrays/array_initialization/array_initialization.c:8: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -149,29 +169,32 @@ main:
     </div>
 
     <div class="example">
-        <h2>Variables</h2>
+        <h2>Multidimensional Array</h2>
         <div class="description">
-            <p>Basic variable declaration and arithmetic. This shows how local variables are allocated on the stack and how simple arithmetic operations translate to assembly instructions.</p>
+            <p>Two-dimensional arrays and row-major order storage.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li><strong>Stack Allocation:</strong> Local variables are stored on the stack, typically accessed via offsets from the base pointer (<code>rbp</code>)</li>
-<li><strong>Register Usage:</strong> The compiler uses registers for temporary calculations to improve performance</li>
-<li><strong>Arithmetic Instructions:</strong> Simple operations like addition compile to single instructions like <code>add</code> or <code>lea</code></li>
+<li><strong>Row-Major Order:</strong> C stores 2D arrays in row-major order (all elements of row 0, then row 1, etc.)</li>
+<li><strong>Index Calculation:</strong> Element [i][j] is at offset (i * num_columns + j) * element_size</li>
+<li><strong>Nested Loops:</strong> Accessing 2D arrays typically uses nested loops in assembly</li>
+<li><strong>Cache Efficiency:</strong> Row-major access patterns are more cache-friendly</li>
 </ul>
-<p class="reference">Reference: <a href="https://gist.github.com/lancejpollard/adf75b90137ef29e6f02" target="_blank">Simple C examples and their Assembly output from GCC</a></p>
+<p class="reference">Reference: <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order" target="_blank">Wikipedia - Row and column-major order</a></p>
         </div>
         <div class="code-section c-code">
             <h3>C Code</h3>
             <pre><code>int main() {
-    int a = 10;
-    int b = 20;
-    int c = a + b;
-    return c;
+    int matrix[2][3] = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
+    int sum = matrix[0][1] + matrix[1][2];
+    return sum;
 }</code></pre>
         </div>
         <div class="code-section asm-code">
             <h3>Assembly Code (Intel Syntax)</h3>
-            <pre><code>	.file	&quot;variables.c&quot;
+            <pre><code>	.file	&quot;multidimensional_array.c&quot;
 	.intel_syntax noprefix
 # GNU C17 (Debian 12.2.0-14+deb12u1) version 12.2.0 (x86_64-linux-gnu)
 #	compiled by GNU C version 12.2.0, GMP version 6.2.1, MPFR version 4.2.0, MPC version 1.3.1, isl version isl-0.25-GMP
@@ -189,18 +212,23 @@ main:
 	.cfi_offset 6, -16
 	mov	rbp, rsp	#,
 	.cfi_def_cfa_register 6
-# ./examples/01_basics/variables/variables.c:2:     int a = 10;
-	mov	DWORD PTR -4[rbp], 10	# a,
-# ./examples/01_basics/variables/variables.c:3:     int b = 20;
-	mov	DWORD PTR -8[rbp], 20	# b,
-# ./examples/01_basics/variables/variables.c:4:     int c = a + b;
-	mov	edx, DWORD PTR -4[rbp]	# tmp88, a
-	mov	eax, DWORD PTR -8[rbp]	# tmp89, b
-	add	eax, edx	# tmp87, tmp88
-	mov	DWORD PTR -12[rbp], eax	# c, tmp87
-# ./examples/01_basics/variables/variables.c:5:     return c;
-	mov	eax, DWORD PTR -12[rbp]	# _4, c
-# ./examples/01_basics/variables/variables.c:6: }
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:2:     int matrix[2][3] = {
+	mov	DWORD PTR -32[rbp], 1	# matrix[0][0],
+	mov	DWORD PTR -28[rbp], 2	# matrix[0][1],
+	mov	DWORD PTR -24[rbp], 3	# matrix[0][2],
+	mov	DWORD PTR -20[rbp], 4	# matrix[1][0],
+	mov	DWORD PTR -16[rbp], 5	# matrix[1][1],
+	mov	DWORD PTR -12[rbp], 6	# matrix[1][2],
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
+	mov	edx, DWORD PTR -28[rbp]	# _1, matrix[0][1]
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
+	mov	eax, DWORD PTR -12[rbp]	# _2, matrix[1][2]
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:6:     int sum = matrix[0][1] + matrix[1][2];
+	add	eax, edx	# tmp86, _1
+	mov	DWORD PTR -4[rbp], eax	# sum, tmp86
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:7:     return sum;
+	mov	eax, DWORD PTR -4[rbp]	# _11, sum
+# ./examples/05_arrays/multidimensional_array/multidimensional_array.c:8: }
 	pop	rbp	#
 	.cfi_def_cfa 7, 8
 	ret	
@@ -215,6 +243,7 @@ main:
 
     <footer style="text-align: center; padding: 20px; color: #7f8c8d; margin-top: 40px;">
         <p>Generated Assembly Learning Documentation</p>
+        <p style="font-size: 0.9em;">Compiled with: gcc -S -masm=intel -O0 -fverbose-asm</p>
     </footer>
 </body>
 </html>
